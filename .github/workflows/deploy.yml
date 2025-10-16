@@ -1,0 +1,76 @@
+name: Deploy to Azure Container Apps
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  RESOURCE_GROUP: CDEIA_sistradoc
+  ACR_NAME: acrjurisprudencia8tzl21
+  BACKEND_APP: backend-api
+  FRONTEND_APP: frontend-web
+  CONTAINER_ENV: juridico-env
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Login to ACR
+      run: |
+        az acr login --name ${{ env.ACR_NAME }}
+    
+    - name: Build and Push Backend
+      run: |
+        cd backend
+        docker build -t ${{ env.ACR_NAME }}.azurecr.io/backend-api:latest .
+        docker push ${{ env.ACR_NAME }}.azurecr.io/backend-api:latest
+    
+    - name: Build and Push Frontend
+      run: |
+        cd frontend
+        docker build -t ${{ env.ACR_NAME }}.azurecr.io/frontend-web:latest .
+        docker push ${{ env.ACR_NAME }}.azurecr.io/frontend-web:latest
+    
+    - name: Deploy Backend
+      run: |
+        az containerapp update \
+          --name ${{ env.BACKEND_APP }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --image ${{ env.ACR_NAME }}.azurecr.io/backend-api:latest \
+          --set-env-vars \
+            "AZURE_SEARCH_ENDPOINT=${{ secrets.AZURE_SEARCH_ENDPOINT }}" \
+            "AZURE_SEARCH_API_KEY=${{ secrets.AZURE_SEARCH_API_KEY }}" \
+            "AZURE_SEARCH_INDEX_NAME=${{ secrets.AZURE_SEARCH_INDEX_NAME }}" \
+            "AZURE_OPENAI_ENDPOINT=${{ secrets.AZURE_OPENAI_ENDPOINT }}" \
+            "AZURE_OPENAI_API_KEY=${{ secrets.AZURE_OPENAI_API_KEY }}" \
+            "AZURE_OPENAI_CHAT_DEPLOYMENT=${{ secrets.AZURE_OPENAI_CHAT_DEPLOYMENT }}" \
+            "AZURE_OPENAI_EMBEDDING_DEPLOYMENT=${{ secrets.AZURE_OPENAI_EMBEDDING_DEPLOYMENT }}" \
+            "USE_COSMOS_DB=${{ secrets.USE_COSMOS_DB }}" \
+            "COSMOS_ENDPOINT=${{ secrets.COSMOS_ENDPOINT }}" \
+            "COSMOS_KEY=${{ secrets.COSMOS_KEY }}" \
+            "COSMOS_DB_NAME=${{ secrets.COSMOS_DB_NAME }}" \
+            "COSMOS_CONTAINER_NAME=${{ secrets.COSMOS_CONTAINER_NAME }}"
+    
+    - name: Deploy Frontend
+      run: |
+        BACKEND_URL="http://${{ env.BACKEND_APP }}.internal.wonderfulocean-98856422.eastus2.azurecontainerapps.io"
+        az containerapp update \
+          --name ${{ env.FRONTEND_APP }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --image ${{ env.ACR_NAME }}.azurecr.io/frontend-web:latest \
+          --set-env-vars "BACKEND_URL=$BACKEND_URL"
+    
+    - name: Get Application URL
+      run: |
+        echo "🚀 Application deployed successfully!"
+        echo "Frontend URL: https://${{ env.FRONTEND_APP }}.wonderfulocean-98856422.eastus2.azurecontainerapps.io"

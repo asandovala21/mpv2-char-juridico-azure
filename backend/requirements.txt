@@ -1,0 +1,10 @@
+quart==0.19.3
+quart-cors==0.6.0
+hypercorn==0.15.0
+python-dotenv==1.0.0
+azure-cosmos==4.5.1
+azure-search-documents==11.4.0
+langchain==0.1.0
+langchain-core==0.1.0
+langchain-openai==0.0.2
+openai==1.6.1

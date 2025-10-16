@@ -1,0 +1,50 @@
+# Secretos - NUNCA SUBIR
+.env
+*.env
+.env.*
+secrets/
+*.key
+*.pem
+*.pfx
+azure_config.env
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+build/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Testing - NO NECESARIO EN PRODUCCIÓN
+*.test.js
+*.spec.js
+__tests__/
+coverage/
+.pytest_cache/
+
+# Temporal
+*.tmp
+temp/
+tmp/

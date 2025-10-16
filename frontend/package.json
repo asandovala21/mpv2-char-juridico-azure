@@ -1,0 +1,29 @@
+{
+  "name": "rag-hybrid-app-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@fluentui/react": "^8.118.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "^5.0.1"
+  },
+  "scripts": {
+    "start": "set HOST=127.0.0.1 && set BROWSER=none && react-scripts start",
+    "start:linux": "HOST=127.0.0.1 BROWSER=none react-scripts start",
+    "start:open": "set HOST=127.0.0.1 && react-scripts start",
+    "build": "react-scripts build"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
